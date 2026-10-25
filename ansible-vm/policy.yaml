@@ -1,0 +1,31 @@
+schema_version: 1
+application_type: ansible-vm
+description: >-
+  Applications that configure a virtual machine with an Ansible playbook
+  (for example my-ppm). Draft from what the OpenProject SMTP work had to prove.
+
+characteristics:
+  - id: linked-secrets-reach-playbook
+    meaning: A secret linked to the service in OpenBao arrives in the playbook run and ends up where the application reads it.
+  - id: setting-survives-reboot
+    meaning: A system setting the playbook changes is written to a file the system reads at boot, not only applied to the running system.
+  - id: run-is-idempotent
+    meaning: A second run with the same inputs reports no change.
+  - id: no-secret-in-log
+    meaning: No secret value appears in the playbook output; tasks that handle one set no_log.
+  - id: https-enabled
+    meaning: The application is configured to be served over HTTPS and says so to its proxy.
+
+static_checks:
+  tool: checkov
+  framework: ansible
+  custom_checks_dir: ansible-vm/checks
+  fail_on: [critical, high]
+  checks:
+    - { id: CKV_ANSIBLE_2, severity: high, reason: get_url must validate certificates }
+    - { id: CKV_ANSIBLE_5, severity: high, reason: packages must be signed }
+    - { id: CKV_ANSIBLE_6, severity: medium, reason: force disables signature validation }
+    - { id: CKV2_ANSIBLE_2, severity: high, reason: get_url must use HTTPS }
+    - { id: CKV2_ANSIBLE_3, severity: low, reason: blocks should handle task errors }
+    - { id: CKV_DANTE_ANSIBLE_1, severity: high, reason: a task that passes a secret variable to a module must set no_log (backs no-secret-in-log) }
+    - { id: CKV_DANTE_ANSIBLE_2, severity: low, reason: get_url should set a timeout }

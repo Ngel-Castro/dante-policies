@@ -1,0 +1,10 @@
+metadata:
+  id: "CKV_DANTE_ANSIBLE_2"
+  name: "Ensure get_url sets a timeout"
+  category: "GENERAL_SECURITY"
+definition:
+  cond_type: "attribute"
+  resource_types:
+    - "tasks.ansible.builtin.get_url"
+  attribute: "timeout"
+  operator: "exists"
